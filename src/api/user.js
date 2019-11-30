@@ -8,6 +8,15 @@ export function login(data) {
   })
 }
 
+export function replaceLogin(data) {
+  console.log(data)
+  return request({
+    url: '/publicNumber/getToken',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/user/info',
