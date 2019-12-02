@@ -47,6 +47,35 @@
         </span>
       </el-form-item>
 
+      <el-form-item prop="ip">
+        <span class="svg-container">
+          <svg-icon icon-class="ip" />
+        </span>
+        <el-input
+          ref="ip"
+          v-model="loginForm.ip"
+          type="text"
+          placeholder="ip"
+          name="ip"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+
+      <el-form-item prop="companyCode">
+        <span class="svg-container">
+          <svg-icon icon-class="companyCode" />
+        </span>
+        <el-input
+          ref="companyCode"
+          v-model="loginForm.companyCode"
+          type="text"
+          placeholder="companyCode"
+          name="companyCode"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
@@ -79,8 +108,10 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'yangmg',
+        password: '123456',
+        ip: '127.0.0.1',
+        companyCode: 'ruixue_dev'
       },
       loginRules: {
         username: [
@@ -115,14 +146,13 @@ export default {
       })
     },
     handleLogin() {
-      // user/login
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
           this.$store
-            .dispatch('user/replaceLogin', this.loginForm)
+            .dispatch('user/login', this.loginForm)
             .then(() => {
-              // this.$router.push({ path: this.redirect || '/' })
+              this.$router.push({ path: this.redirect || '/' })
               this.loading = false
             })
             .catch(() => {

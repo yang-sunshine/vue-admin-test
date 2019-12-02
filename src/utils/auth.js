@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 
 const TokenKey = 'vue_admin_template_token'
+const certificateKey = 'sinostrong_certificate'
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -12,4 +13,14 @@ export function setToken(token) {
 
 export function removeToken() {
   return Cookies.remove(TokenKey)
+}
+export function removeCertificate() {
+  return Cookies.remove(certificateKey)
+}
+export function setCertificate(certificate) {
+  return Cookies.set(certificateKey, certificate)
+}
+
+export function getCertificate() {
+  return Cookies.get(certificateKey)
 }

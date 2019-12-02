@@ -1,11 +1,13 @@
-import { login, replaceLogin, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { login, logout, getInfo } from '@/api/user'
+import { getToken, setToken, removeToken, setCertificate, getCertificate, removeCertificate } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
   name: '',
-  avatar: ''
+  id: '',
+  avatar: '',
+  certificate: getCertificate()
 }
 
 const mutations = {
@@ -15,20 +17,32 @@ const mutations = {
   SET_NAME: (state, name) => {
     state.name = name
   },
+  SET_ID: (state, id) => {
+    state.id = id
+  },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_CERTIFICATE: (state, certificate) => {
+    state.certificate = certificate
   }
 }
 
 const actions = {
   // user login
-  login({ commit }, userInfo) {
-    const { username, password } = userInfo
+  login({ commit }, loginInfo) {
+    const { username, password, ip, companyCode } = loginInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: password, ip: ip, companyCode: companyCode }).then(response => {
+        console.log(response)
         const { data } = response
         commit('SET_TOKEN', data.token)
+        commit('SET_ID', data.personId)
+        commit('SET_CERTIFICATE', data.certificate)
+        commit('SET_NAME', username)
+        commit('SET_AVATAR', data.headPicPath)
         setToken(data.token)
+        setCertificate(data.certificate)
         resolve()
       }).catch(error => {
         reject(error)
@@ -36,20 +50,11 @@ const actions = {
     })
   },
 
-  // user login
-  replaceLogin({ commit }, userInfo) {
-    const { username, password } = userInfo
-    console.log(123)
-    return new Promise((resolve, reject) => {
-      replaceLogin({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+  // user logout
+  logout({ commit, state }) {
+    commit('SET_CERTIFICATE', '')
+    removeCertificate()
+    resetRouter()
   },
 
   // get user info
@@ -74,7 +79,7 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state }) {
+  logout1({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
@@ -94,7 +99,16 @@ const actions = {
       removeToken()
       resolve()
     })
+  },
+  // remove certificate
+  resetCertificate({ commit }) {
+    return new Promise(resolve => {
+      commit('SET_CERTIFICATE', '')
+      removeCertificate()
+      resolve()
+    })
   }
+
 }
 
 export default {
