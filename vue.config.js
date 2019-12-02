@@ -40,7 +40,7 @@ module.exports = {
       // change xxx-api/login => mock/login
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       '': {
-        target: 'http://114.215.254.30:80/welearning/',
+        target: 'http://114.215.254.30:80/welearning/api',
         changeOrigin: true,
         ws: true
       }

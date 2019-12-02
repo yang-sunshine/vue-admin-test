@@ -1,13 +1,13 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken, setCertificate, getCertificate, removeCertificate } from '@/utils/auth'
+import { login, getInfo } from '@/api/user'
+import { getCertificate, getPerson, getCompanyCode, setCompanyCode, setPerson, setCertificate, removeCompanyCode, removeCertificate, removePerson } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const state = {
-  token: getToken(),
+  certificate: getCertificate(),
   name: '',
-  id: '',
+  id: getPerson(),
   avatar: '',
-  certificate: getCertificate()
+  companyCode: getCompanyCode()
 }
 
 const mutations = {
@@ -25,6 +25,9 @@ const mutations = {
   },
   SET_CERTIFICATE: (state, certificate) => {
     state.certificate = certificate
+  },
+  SET_COMPANYCODE: (state, companyCode) => {
+    state.companyCode = companyCode
   }
 }
 
@@ -32,18 +35,37 @@ const actions = {
   // user login
   login({ commit }, loginInfo) {
     const { username, password, ip, companyCode } = loginInfo
+
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password, ip: ip, companyCode: companyCode }).then(response => {
-        console.log(response)
         const { data } = response
-        commit('SET_TOKEN', data.token)
         commit('SET_ID', data.personId)
         commit('SET_CERTIFICATE', data.certificate)
+        commit('SET_COMPANYCODE', companyCode)
+        setCompanyCode(companyCode)
+        setPerson(data.personId)
+        setCertificate(data.certificate)
+
         commit('SET_NAME', username)
         commit('SET_AVATAR', data.headPicPath)
-        setToken(data.token)
-        setCertificate(data.certificate)
         resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // get user info
+  getInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      const id = state.id
+      const companyCode = state.companyCode
+      getInfo({ id: id, companyCode: companyCode }).then(response => {
+        const { data } = response
+        const { real_name, head_pic_path } = data
+        commit('SET_NAME', real_name)
+        commit('SET_AVATAR', head_pic_path)
+        resolve(data)
       }).catch(error => {
         reject(error)
       })
@@ -53,53 +75,12 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     commit('SET_CERTIFICATE', '')
-    removeCertificate()
+    commit('SET_COMPANYCODE', '')
+    removeCompanyCode()
+    removePerson()
     resetRouter()
   },
 
-  // get user info
-  getInfo({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
-        if (!data) {
-          reject('Verification failed, please Login again.')
-        }
-
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-
-  // user logout
-  logout1({ commit, state }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        commit('SET_TOKEN', '')
-        removeToken()
-        resetRouter()
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-
-  // remove token
-  resetToken({ commit }) {
-    return new Promise(resolve => {
-      commit('SET_TOKEN', '')
-      removeToken()
-      resolve()
-    })
-  },
   // remove certificate
   resetCertificate({ commit }) {
     return new Promise(resolve => {

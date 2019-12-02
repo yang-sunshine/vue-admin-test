@@ -8,17 +8,12 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo(data) {
+  console.log(data)
   return request({
     url: '/person/get',
     method: 'post',
-    params: { token }
+    data
   })
 }
 
-export function logout() {
-  return request({
-    url: '/user/logout',
-    method: 'post'
-  })
-}

@@ -4,13 +4,13 @@ Vue.prototype.qs = QS
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken, getCertificate } from '@/utils/auth'
+import { getToken, getCertificate, getCompanyCode } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 2000 // request timeout
+  timeout: 10000 // request timeout
 })
 
 // request interceptor
@@ -20,10 +20,9 @@ service.interceptors.request.use(
     if (store.getters.token) {
       config.headers['X-Token'] = getToken()
     }
-    console.log(store.getters.certificate)
-    if (store.getters.certificate && config.data) {
-      config.data.certificate = getCertificate()
-    }
+
+    config.data.certificate = getCertificate() ? getCertificate() : 'sinoStrong'
+    config.data.companyCode = getCompanyCode() ? getCompanyCode() : 'ruixue_dev'
     if (config.method === 'post') {
       config.data = QS.stringify(config.data)
     }
