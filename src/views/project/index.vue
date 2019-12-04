@@ -1,16 +1,14 @@
 <template>
   <div class="app-container">
-
     <div class="filter-container">
-      <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="search" />
+      <el-input v-model="listQuery.name" placeholder="班级名称" style="width: 200px;" class="filter-item" @keyup.enter.native="search" />
 
-      <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in projectStatus" :key="item.key" :value="item.key" />
+      <el-select v-model="listQuery.status" placeholder="状态" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in projectStatus" :key="item.key" :label="item.name" :value="item.value" />
       </el-select>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="search">
-        Search
-      </el-button>
-
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="search">查询</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="add">添加</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="exportExcal">导出</el-button>
     </div>
 
     <el-table
@@ -21,17 +19,17 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
-      </el-table-column>
       <el-table-column label="Title">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="班级人数" width="110" align="center">
+      <el-table-column label="有效时间" width="300" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.time }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="班级人数" width="100" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.projectNumber }}</span>
         </template>
@@ -41,37 +39,35 @@
           <el-button size="mini" type="danger" @click="operate(row,'status')">{{ scope.row.status| filterStatus }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
+      <el-table-column label="完成进度" width="110" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <span>{{ scope.row.projectProgress|progressNum }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <em class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="operate(row,'edit')">编辑</el-button>
+          <el-button type="primary" size="mini" @click="operate(row,'copy')">复制</el-button>
+          <el-button type="primary" size="mini" @click="operate(row,'send')">发送通知</el-button>
           <el-button size="mini" type="danger" @click="operate(row,'del')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNo" :limit.sync="listQuery.limit" @pagination="fetchData" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.pageNo" :limit.sync="listQuery.pageSize" @pagination="fetchData" />
 
   </div>
 </template>
 
 <script>
-import { getList } from '@/api/project'
+import { getList, copyProject, delProject, exportProjectList } from '@/api/project'
+import { parseTime } from '@/utils/index'
 import Pagination from '@/components/Pagination'
+import store from '@/store'
 
 const projectStatus = [
-  { key: 0, value: '全部' },
-  { key: 1, value: '开启' },
-  { key: 2, value: '关闭' }
+  { key: 0, value: '', name: '全部' },
+  { key: 1, value: 'show', name: '开启' },
+  { key: 2, value: 'hidden', name: '关闭' }
 ]
 export default {
   name: '',
@@ -86,7 +82,10 @@ export default {
       return statusMap[status]
     },
     filterStatus(status) {
-      return status ? '开启' : '关闭'
+      return status === 'show' ? '开启' : '关闭'
+    },
+    progressNum(number) {
+      return (number * 100).toFixed(2) + '%'
     }
   },
   data() {
@@ -97,8 +96,8 @@ export default {
       listQuery: {
         pageNo: 3,
         pageSize: 15,
-        title: '',
-        type: '',
+        name: '',
+        status: '',
         needTotalSize: true,
         kind: 'project',
         publicNumberId: 1
@@ -113,6 +112,10 @@ export default {
     fetchData() {
       this.listLoading = true
       getList(this.listQuery).then(response => {
+        var len = response.data.records.length
+        for (var i = 0; i < len; i++) {
+          response['data']['records'][i]['time'] = parseTime(response['data']['records'][i]['start_time']) + '~' + parseTime(response['data']['records'][i]['end_time'])
+        }
         this.list = response.data.records
         this.total = response.data.totalSize
         this.listLoading = false
@@ -122,19 +125,47 @@ export default {
       })
     },
     search() {
-      this.fetchData
+      this.fetchData()
     },
     operate(row, status) {
-      console.log(row)
+      const id = row.id
+      const personId = store.getters.id
+      switch (status) {
+        case 'edit':
+          this.$router.push('/project/edit/' + id)
+          break
+        case 'copy':
+          copyProject({ id: id, personId: personId }).then(response => {
+            this.$message('复制成功')
+            this.fetchData()
+          })
+          break
+        case 'send':
+          break
+        case 'del':
+          delProject({ id: id }).then(response => {
+            this.fetchData()
+            this.$message('删除成功')
+          })
+          break
+        default:
+      }
+    },
+    add() {
+      this.$router.push({ path: '/project/add' })
+    },
+
+    exportExcal() {
+      exportProjectList(this.listQuery).then(response => {
+        location.href = response.data
+      })
     }
   }
 }
 </script>
-<style lang="scss" scoped>
-.table {
-  &-filter-container {
-    padding-bottom: 10px;
+<style scoped>
+.filter-container {
+    padding-bottom: 10px;float: right;
   }
-}
 
 </style>

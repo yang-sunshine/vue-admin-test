@@ -35,12 +35,12 @@ export default {
     pageSizes: {
       type: Array,
       default() {
-        return [10, 30, 100]
+        return [15, 30, 100]
       }
     },
     layout: {
       type: String,
-      default: 'total, sizes, prev, pager, next, jumper'
+      default: 'prev, pager, next,sizes,total, jumper'
     },
     background: {
       type: Boolean,

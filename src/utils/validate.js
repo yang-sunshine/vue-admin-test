@@ -19,3 +19,15 @@ export function validUsername(str) {
   // return valid_map.indexOf(str.trim()) >= 0
   return str.trim().length > 0
 }
+
+export function validRmpty(str) {
+  if (str) {
+    if (str.constructor === String) {
+      return str.trim().length > 0
+    } else {
+      return str.length > 0
+    }
+  } else {
+    return false
+  }
+}

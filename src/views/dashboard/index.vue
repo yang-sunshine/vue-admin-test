@@ -1,22 +1,14 @@
 <template>
-  <section class="section-body">
-    <info-line
-      :id="'timeLine'"
-      :loading="timeLoading"
-      :opt-renderer="'canvas'"
-      :option="timeLineOption"
-    />
-  </section>
+  <section class="section-body" />
 </template>
 
 <script>
-import infoLine from '@/components/Echarts/lineMarker'
+
+import { getList } from '@/api/index'
 
 export default {
   name: 'DataInfo',
-  components: {
-    infoLine
-  },
+
   data() {
     return {
       timeLineOption: {},
@@ -24,23 +16,14 @@ export default {
     }
   },
   mounted() {
-    this.setLineOption()
+    this.test()
   },
   methods: {
-    setLineOption() {
-      this.timeLineOption = {
-        xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [{
-          data: [820, 932, 901, 934, 1290, 1330, 1320],
-          type: 'line'
-        }]
-      }
+    test() {
+      var param = { signinId: 1, memberId: 1098, pageSize: 10, pageNo: 1, signinRankType: 1 }
+      getList(param).then(Response => {
+        console.log(Response)
+      })
     }
   }
 }

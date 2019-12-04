@@ -56,15 +56,29 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/project',
     component: Layout,
-    redirect: '/example/table',
+    redirect: '/project/index',
     name: '资源管理',
     meta: { title: '资源管理', icon: 'example' },
     children: [
       {
-        path: 'project',
-        name: 'project',
+        path: 'add',
+        component: () => import('@/views/project/add'),
+        name: '添加班级',
+        meta: { title: '添加班级', icon: 'edit' },
+        hidden: true
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/project/edit'),
+        name: '编辑班级',
+        meta: { title: '编辑班级', icon: 'edit' },
+        hidden: true
+      },
+      {
+        path: 'index',
+        name: 'index',
         component: () => import('@/views/project/index'),
         meta: { title: '班级管理', icon: 'table' }
       },

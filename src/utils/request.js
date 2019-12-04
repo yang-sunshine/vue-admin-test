@@ -21,10 +21,15 @@ service.interceptors.request.use(
       config.headers['X-Token'] = getToken()
     }
 
-    config.data.certificate = getCertificate() ? getCertificate() : 'sinoStrong'
-    config.data.companyCode = getCompanyCode() ? getCompanyCode() : 'ruixue_dev'
+    var defaultCompanyCode = getCompanyCode() ? getCompanyCode() : 'ruixue_dev'
+    var defaultCertificate = getCertificate() ? getCertificate() : 'sinoStrong'
     if (config.method === 'post') {
+      config.data.certificate = defaultCompanyCode
+      config.data.companyCode = defaultCertificate
       config.data = QS.stringify(config.data)
+    } else if (config.method === 'get') {
+      config.params.certificate = defaultCertificate
+      config.params.companyCode = defaultCompanyCode
     }
     return config
   },
