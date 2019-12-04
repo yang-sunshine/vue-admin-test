@@ -16,7 +16,7 @@ export default {
     }
   },
   mounted() {
-    this.test()
+
   },
   methods: {
     test() {

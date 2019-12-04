@@ -45,9 +45,6 @@ const actions = {
         setCompanyCode(companyCode)
         setPerson(data.personId)
         setCertificate(data.certificate)
-
-        commit('SET_NAME', username)
-        commit('SET_AVATAR', data.headPicPath)
         resolve()
       }).catch(error => {
         reject(error)
@@ -62,9 +59,10 @@ const actions = {
       const companyCode = state.companyCode
       getInfo({ id: id, companyCode: companyCode }).then(response => {
         const { data } = response
-        const { real_name, head_pic_path } = data
+        const { real_name, head_pic_path, id } = data
         commit('SET_NAME', real_name)
         commit('SET_AVATAR', head_pic_path)
+        commit('SET_ID', id)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -73,11 +71,12 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state }) {
+  logout({ commit }) {
     commit('SET_CERTIFICATE', '')
     commit('SET_COMPANYCODE', '')
     removeCompanyCode()
     removePerson()
+    removeCertificate()
     resetRouter()
   },
 

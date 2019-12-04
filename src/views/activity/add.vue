@@ -13,9 +13,38 @@
       <el-col :span="12"><el-input v-model="form.name" /></el-col>
     </el-form-item>
     <el-form-item label="摘要">
-      <el-input v-model="form.summary" type="textarea" :rows="6" />
+      <el-col :span="12"><el-input v-model="form.summary" type="textarea" :rows="6" /></el-col>
     </el-form-item>
-    <el-form-item label="开班有效时间" prop="time">
+    <el-form-item label="封面图">
+      <el-col :span="12">
+        <Upload v-model="form.cover" />
+      </el-col>
+    </el-form-item>
+
+    <el-form-item label="活动介绍">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+    <el-form-item label="报名须知">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+    <el-form-item label="报名成功信息">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+    <el-form-item label="报名失败信息">
+      <Tinymce ref="editor" v-model="form.content" :height="400" />
+    </el-form-item>
+
+    <el-form-item label="报名信息">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+
+    <el-form-item label="名额">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+    <el-form-item label="是否须要审核">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
+    </el-form-item>
+    <el-form-item label="活动时间" prop="time">
       <el-date-picker
         v-model="form.time"
         type="datetimerange"
@@ -25,10 +54,11 @@
         value-format="yyyy-MM-dd HH:mm:ss"
       />
     </el-form-item>
-    <el-form-item label="班级地址">
-      <el-col :span="20"><el-input v-model="form.url" size="small" /></el-col>
+    <el-form-item label="报名信息">
+      <el-col :span="12"><el-input v-model="form.cover" /></el-col>
     </el-form-item>
-    <el-form-item label="班级状态">
+
+    <el-form-item label="积分规则">
       <el-switch v-model="form.projectStatus" />
     </el-form-item>
     <el-form-item label="允许分享">
@@ -37,24 +67,7 @@
     <el-form-item label="允许粉丝访问">
       <el-switch v-model="form.is_allow_fans_visit" />
     </el-form-item>
-    <el-form-item label="课堂互动">
-      <el-switch v-model="form.is_interact" />
-    </el-form-item>
-    <el-form-item label="开启内容学习统计">
-      <el-switch v-model="form.is_content_statistics" />
-    </el-form-item>
-    <el-form-item label="班级搜索">
-      <el-radio-group v-model="form.search_status">
-        <el-radio label="开启" />
-        <el-radio label="关闭" />
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item label="允许关键字加入班级">
-      <el-switch v-model="form.is_code_join" />
-    </el-form-item>
-    <el-form-item label="版权归属">
-      <el-col :span="12"><el-input v-model="form.bottom_txt" size="small" /></el-col>
-    </el-form-item>
+
     <el-form-item>
       <el-button type="primary" :loading="loading" @click="onSubmit">保存</el-button>
       <el-button @click="cancelBack">取消</el-button>
@@ -63,10 +76,13 @@
 </template>
 
 <script>
+import Tinymce from '@/components/Tinymce'
+import Upload from '@/components/Upload/resourceCover'
 import { validRmpty } from '@/utils/validate'
 import { addProject, editProject } from '@/api/project'
 import store from '@/store'
 export default {
+  components: { Tinymce, Upload },
   data() {
     const validateEmpty = (rule, value, callback) => {
       if (!validRmpty(value)) {

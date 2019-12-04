@@ -1,4 +1,4 @@
-<!-- 班级班级 -->
+<!--  -->
 <template>
   <div />
 </template>
