@@ -24,8 +24,8 @@ service.interceptors.request.use(
     var defaultCompanyCode = getCompanyCode() ? getCompanyCode() : 'ruixue_dev'
     var defaultCertificate = getCertificate() ? getCertificate() : 'sinoStrong'
     if (config.method === 'post') {
-      config.data.certificate = defaultCompanyCode
-      config.data.companyCode = defaultCertificate
+      config.data.certificate = defaultCertificate
+      config.data.companyCode = defaultCompanyCode
       config.data = QS.stringify(config.data)
     } else if (config.method === 'get') {
       config.params.certificate = defaultCertificate
