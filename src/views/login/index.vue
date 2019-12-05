@@ -46,36 +46,6 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-form-item prop="ip">
-        <span class="svg-container">
-          <svg-icon icon-class="ip" />
-        </span>
-        <el-input
-          ref="ip"
-          v-model="loginForm.ip"
-          type="text"
-          placeholder="ip"
-          name="ip"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
-
-      <el-form-item prop="companyCode">
-        <span class="svg-container">
-          <svg-icon icon-class="companyCode" />
-        </span>
-        <el-input
-          ref="companyCode"
-          v-model="loginForm.companyCode"
-          type="text"
-          placeholder="companyCode"
-          name="companyCode"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
